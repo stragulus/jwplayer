@@ -80,7 +80,7 @@ class TimeSlider extends Slider {
         this.timeTip.setup();
 
         this.cues = [];
-        this.comments = [];
+        this.comments = []; // Comment UI elements
 
         // Store the attempted seek, until the previous one completes
         this.seekThrottled = throttle(this.performSeek, 400);
@@ -96,6 +96,7 @@ class TimeSlider extends Slider {
         this._model
             .on('change:duration', this.onDuration, this)
             .on('change:cues', this.addCues, this)
+            .on('change:comments', this.setComments, this)
             .on('seeked', () => {
                 if (!this._model.get('scrubbing')) {
                     this.updateAriaText();
@@ -179,7 +180,13 @@ class TimeSlider extends Slider {
             return;
         }
         this.reset();
-        this.resetComments();
+        // setting the model comments to an empty list will trigger a change:comments
+        // event which in turn will trigger a redraw of the comments
+        // TODO: Should I be accessing the model from the view like this if so much
+        //       effort is taken in giving it underscores? This needs to be handled
+        //       in the model itself, as does loading comments from tracks (which is
+        //       the reason this needs to be here to begin with)
+        this._model._model.setComments([]); 
         this.addCues(model, model.get('cues'));
 
         const tracks = playlistItem.tracks;
@@ -294,6 +301,20 @@ class TimeSlider extends Slider {
                 this.addCue(ele);
             });
             this.drawCues();
+        }
+    }
+
+    setComments(model, comments) {
+        // triggered whenever comments are set or added to the model. It will 
+        // clear all comment views and recreate a new set
+        // TODO: would be nice if comments could be *added* without destroying
+        // all the divs
+        this.resetComments();
+        if (comments && comments.length) {
+            comments.forEach((ele) => {
+                this.addComment(ele);
+            });
+            this.drawComments();
         }
     }
 

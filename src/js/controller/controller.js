@@ -933,6 +933,14 @@ Object.assign(Controller.prototype, {
             _model.set('cues', cues);
         };
 
+        this.setComments = function (comments) {
+            _model.setComments(comments);
+        };
+
+        this.addComment = function (comment) {
+            _model.addComment(comment);
+        };
+
         this.updatePlaylist = function(playlist, feedData) {
             try {
                 const filteredPlaylist = filterPlaylist(playlist, _model, feedData);

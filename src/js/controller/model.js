@@ -208,6 +208,26 @@ const Model = function() {
         }
         this.set('bandwidthEstimate', bwEstimate);
     };
+
+    this.addComment = function (comment) {
+        // add a comment to existing comments
+        // TODO: not concurrency safe. Should it be?
+        // TODO: validate comment
+        let comments = this.get('comments') || [];
+        comments.push(comment);
+        this.set('comments', comments);
+    };
+
+    this.setComments = function(comments) {
+        // set multiple comments at once, replacing any existing comments
+        // TODO: validate comments
+        this.set('comments', comments);
+    };
+
+    this.getComments = function() {
+        // TODO: not a deep copy?
+        return this.get('comments');
+    };
 };
 
 const syncProviderProperties = (model, provider) => {

@@ -51,6 +51,8 @@ const CoreShim = function(originalContainer) {
         'setVolume',
         'setPlaybackRate',
         'setCues',
+        'setComments',
+        'addComment',
 
         // These commands require the view instance to be available
         'resize',
@@ -211,6 +213,9 @@ Object.assign(CoreShim.prototype, {
     },
     getCurrentAudioTrack() {
         return -1;
+    },
+    getComments() {
+        return this._model.getComments();
     },
 
     // These methods require the view

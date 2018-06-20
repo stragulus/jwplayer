@@ -557,6 +557,14 @@ export default function Api(element) {
         },
 
         /**
+         * Gets the comments displayed on the time slider.
+         * @returns {Array} Array of comments.
+         */
+        getComments() {
+            return core.getComments();
+        }, 
+
+        /**
          * Sets captions styles.
          * @param {object} captionsStyles - The captions styling configuration to apply.
          * @returns {Api} The Player API instance.
@@ -666,6 +674,29 @@ export default function Api(element) {
         },
 
         /**
+         * Replaces all comments to be displayed on the time slider with a
+         * new set. This method is more efficient than calling addComment
+         * in quick succession.
+         *
+         * @param {Array} comments - The comment to set.
+         * @returns {Api} The Player API instance.
+         */
+        setComments(comments) {
+            core.setComments(comments);
+            return this;
+        },
+
+        /**
+         * Adds a comment to be displayed on the time slider.
+         * @param {object} comment - The comment to add.
+         * @returns {Api} The Player API instance.
+         */
+        addComment(comment) {
+            core.addComment(comment);
+            return this;
+        },
+
+        /**
          * Set the player's volume level.
          * @param {number} level - A value from 0-100.
          * @returns {Api} The Player API instance.
@@ -678,7 +709,7 @@ export default function Api(element) {
         /**
          * Stop any active playback, and loads either a new playlist, a new playlist item,
          * or an item already in the current playlist.
-         * @param {string|Array.<PlaylistItem>|PlaylistItem|number} toLoad - The feed url, playlist,
+         * @param {string|array.<playlistitem>|PlaylistItem|number} toLoad - The feed url, playlist,
          * playlist item, or playlist item index to load.
          * @param {object} [feedData] - The feed data to associate with playlist items.
          * Only applied when passing in a playlist or playlist items.

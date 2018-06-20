@@ -33,15 +33,17 @@ const CommentsMixin = {
     commentsLoaded: function (evt) {
         const data = JSON.parse(evt.responseText);
         if (Array.isArray(data.comments)) {
-            data.comments.forEach((obj) => this.addComment(obj));
-            this.drawComments();
+            // set all comments at once. Will trigger a change:comments events which
+            // will trigger the redraw.
+            // TODO: model model
+            this._model._model.setComments(data.comments);
         }
     },
 
     commentsFailed: function () {},
 
     addComment: function (obj) {
-        // TODO: correct naming of attributes ?
+        // add new comment popup to existing list
         this.comments.push(new CommentCue(obj.video_position, obj.message, obj.author));
     },
 
@@ -65,12 +67,12 @@ const CommentsMixin = {
     },
 
     resetComments: function() {
+        // clears comment popups
         this.comments.forEach((comment) => {
             if (comment.el.parentNode) {
                 comment.el.parentNode.removeChild(comment.el);
             }
         });
-        this.comments = [];
     }
 };
 
