@@ -83,6 +83,7 @@ export default class Controls {
         this.backdrop = backdrop;
 
         this.logo = this.playerContainer.querySelector('.jw-logo');
+        this._model = model;
 
         const touchMode = model.get('touchMode');
 
@@ -442,16 +443,24 @@ export default class Controls {
     }
 
     userActive(timeout = ACTIVE_TIMEOUT) {
+        const alwaysOn = this._model && (
+            this._model.get('userControlsAlwaysOn')
+            || this._model.get('commentsAvailable')
+        );
+
         if (timeout > 0) {
-            this.inactiveTime = now() + timeout;
-            if (this.activeTimeout === -1) {
-                this.activeTimeout = setTimeout(this.userInactiveTimeout, timeout);
+            if (!alwaysOn) {
+                this.inactiveTime = now() + timeout;
+                if (this.activeTimeout === -1) {
+                    this.activeTimeout = setTimeout(this.userInactiveTimeout, timeout);
+                }
             }
         } else {
             clearTimeout(this.activeTimeout);
             this.activeTimeout = -1;
             this.inactiveTime = 0;
         }
+
         if (!this.showing) {
             removeClass(this.playerContainer, 'jw-flag-user-inactive');
             this.showing = true;

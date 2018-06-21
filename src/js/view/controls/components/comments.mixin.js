@@ -45,6 +45,7 @@ const CommentsMixin = {
     addComment: function (obj) {
         // add new comment popup to existing list
         this.comments.push(new CommentCue(obj.video_position, obj.message, obj.author));
+        this._model.set('commentsAvailable', true);
     },
 
     drawComments: function () {
@@ -82,6 +83,7 @@ const CommentsMixin = {
     },
 
     resetComments: function() {
+        this._model.set('commentsAvailable', false);
         // clears comment popups
         this.comments.forEach((comment) => {
             if (comment.el.parentNode) {
