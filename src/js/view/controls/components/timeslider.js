@@ -7,6 +7,7 @@ import UI, { getPointerType } from 'utils/ui';
 import Slider from 'view/controls/components/slider';
 import Tooltip from 'view/controls/components/tooltip';
 import ChaptersMixin from 'view/controls/components/chapters.mixin';
+import CommentsMixin from 'view/controls/components/comments.mixin';
 import ThumbnailsMixin from 'view/controls/components/thumbnails.mixin';
 
 class TimeTip extends Tooltip {
@@ -79,6 +80,7 @@ class TimeSlider extends Slider {
         this.timeTip.setup();
 
         this.cues = [];
+        this.comments = [];
 
         // Store the attempted seek, until the previous one completes
         this.seekThrottled = throttle(this.performSeek, 400);
@@ -184,6 +186,8 @@ class TimeSlider extends Slider {
                 this.loadThumbnails(track.file);
             } else if (track && track.kind && track.kind.toLowerCase() === 'chapters') {
                 this.loadChapters(track.file);
+            } else if (track && track.kind && track.kind.toLowerCase() === 'comments') {
+                this.loadComments(track.file);
             }
         }, this);
     }
@@ -230,6 +234,7 @@ class TimeSlider extends Slider {
 
         // With touch events, we never will get the hover events on the cues that cause cues to be active.
         // Therefore use the info we about the scroll position to detect if there is a nearby cue to be active.
+        // TODO: support comments as well
         if (getPointerType(evt.sourceEvent) === 'touch') {
             this.activeCue = this.cues.reduce((closeCue, cue) => {
                 if (Math.abs(position - (parseInt(cue.pct) / 100 * railBounds.width)) < this.mobileHoverDistance) {
@@ -241,6 +246,8 @@ class TimeSlider extends Slider {
 
         if (this.activeCue) {
             timetipText = this.activeCue.text;
+        } else if (this.activeComment) {
+            timetipText = this.activeComment.text;
         } else {
             const allowNegativeTime = true;
             timetipText = timeFormat(time, allowNegativeTime);
@@ -254,7 +261,7 @@ class TimeSlider extends Slider {
 
         timeTip.update(timetipText);
         if (this.textLength !== timetipText.length) {
-            // An activeCue may cause the width of the timeTip container to change
+            // An activeCue or activeComment may cause the width of the timeTip container to change
             this.textLength = timetipText.length;
             timeTip.resetWidth();
         }
@@ -303,11 +310,12 @@ class TimeSlider extends Slider {
 
     reset() {
         this.resetThumbnails();
+        this.resetComments();
         this.timeTip.resetWidth();
         this.textLength = 0;
     }
 }
 
-Object.assign(TimeSlider.prototype, ChaptersMixin, ThumbnailsMixin);
+Object.assign(TimeSlider.prototype, ChaptersMixin, CommentsMixin, ThumbnailsMixin);
 
 export default TimeSlider;
