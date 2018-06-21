@@ -66,11 +66,19 @@ const CommentsMixin = {
         });
     },
 
-    commentAtOffset: function(duration) {
-        // TODO: actually implement
-        if (duration >= 19 && duration < 22 && this.comments.length) {
-            return this.comments[0];
-        }
+    commentAtOffset: function(position) {
+        let matchingComment;
+
+        // first comment that matches position wins
+        // TODO: optimize this by keeping a sorted position list and splice
+        this.comments.some((comment) => {
+            if (comment.time <= position && position <= comment.time + 3) {
+                matchingComment = comment;
+                return true;
+            }
+        });
+
+        return matchingComment;
     },
 
     resetComments: function() {
