@@ -66,6 +66,13 @@ const CommentsMixin = {
         });
     },
 
+    commentAtOffset: function(duration) {
+        // TODO: actually implement
+        if (duration >= 19 && duration < 22 && this.comments.length) {
+            return this.comments[0];
+        }
+    },
+
     resetComments: function() {
         // clears comment popups
         this.comments.forEach((comment) => {

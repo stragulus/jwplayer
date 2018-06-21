@@ -22,6 +22,8 @@ class TimeTip extends Tooltip {
         this.containerWidth = 0;
         this.textLength = 0;
         this.dragJustReleased = false;
+        // is user manually selecting the time tool tip?
+        this.showSelectedToolTip = false;
 
         const wrapper = document.createElement('div');
         wrapper.className = 'jw-time-tip jw-reset';
@@ -37,7 +39,7 @@ class TimeTip extends Tooltip {
     }
 
     update(txt, author) {
-        this.author.textContent = author || "";
+        this.author.textContent = author || '';
         this.text.textContent = txt;
     }
 
@@ -149,6 +151,17 @@ class TimeSlider extends Slider {
 
     onPosition(model, position) {
         this.updateTime(position, model.get('duration'));
+        // if user is not manually selecting a tool tip to show, try to auto-show comments 
+        // if available around the current duration
+        if (!this.showSelectedToolTip) {
+            const comment = this.commentAtOffset(position);
+            if (comment) {
+                const pct = this.calcPct(position, model.get('duration'));
+                this.renderTimeToolTip(pct, comment.text, comment.author);
+            } else {
+                this.disableTimeToolTip();
+            }
+        }
     }
 
     onDuration(model, duration) {
@@ -163,19 +176,37 @@ class TimeSlider extends Slider {
         this.streamType = streamType;
     }
 
-    updateTime(position, duration) {
+    calcPct(position, duration) {
         let pct = 0;
         if (duration) {
             if (this.streamType === 'DVR') {
                 const dvrSeekLimit = this._model.get('dvrSeekLimit');
                 const diff = duration + dvrSeekLimit;
                 const pos = position + dvrSeekLimit;
-                pct = (diff - pos) / diff * 100;
+                pct = (diff - pos) / diff;
             } else if (this.streamType === 'VOD' || !this.streamType) {
                 // Default to VOD behavior if streamType isn't set
-                pct = position / duration * 100;
+                pct = position / duration;
             }
         }
+        return pct;
+    }
+
+    calcTime(duration, pct) {
+        let time = duration * pct;
+
+        // For DVR we need to swap it around
+        if (duration < 0) {
+            const dvrSeekLimit = this._model.get('dvrSeekLimit');
+            duration += dvrSeekLimit;
+            time = (duration * pct);
+            time = duration - time;
+        }
+        return time;
+    }
+
+    updateTime(position, duration) {
+        const pct = this.calcPct(position, duration) * 100;
         this.render(pct);
     }
 
@@ -228,20 +259,11 @@ class TimeSlider extends Slider {
             return;
         }
 
-        const playerWidth = this._model.get('containerWidth');
         const railBounds = bounds(this.elementRail);
         let position = (evt.pageX ? (evt.pageX - railBounds.left) : evt.x);
         position = between(position, 0, railBounds.width);
         const pct = position / railBounds.width;
-        let time = duration * pct;
-
-        // For DVR we need to swap it around
-        if (duration < 0) {
-            const dvrSeekLimit = this._model.get('dvrSeekLimit');
-            duration += dvrSeekLimit;
-            time = (duration * pct);
-            time = duration - time;
-        }
+        const time = this.calcTime(duration, pct);
 
         let timetipText;
         let author;
@@ -272,7 +294,16 @@ class TimeSlider extends Slider {
                 timetipText = 'Live';
             }
         }
+
+        this.renderTimeToolTip(pct, timetipText, author);
+        this.showSelectedToolTip = true;
+    }
+
+    renderTimeToolTip(pct, timetipText, author) {
         const timeTip = this.timeTip;
+        const railBounds = bounds(this.elementRail);
+        const playerWidth = this._model.get('containerWidth');
+        const time = this.calcTime(this._model.get('duration'), pct);
 
         timeTip.update(timetipText, author);
         if (this.textLength !== timetipText.length) {
@@ -281,8 +312,6 @@ class TimeSlider extends Slider {
             timeTip.resetWidth();
         }
         this.showThumbnail(time);
-
-        addClass(timeTip.el, 'jw-open');
 
         const timeTipWidth = timeTip.getWidth();
         const widthPct = railBounds.width / 100;
@@ -294,9 +323,22 @@ class TimeSlider extends Slider {
         }
         const safePct = Math.min(1 - timeTipPct, Math.max(timeTipPct, pct)).toFixed(3) * 100;
         style(timeTip.el, { left: safePct + '%' });
+        
+        this.enableTimeToolTip();
     }
 
     hideTimeTooltip() {
+        this.disableTimeToolTip();
+        this.showSelectedToolTip = false;
+    }
+
+    enableTimeToolTip() {
+        // start displaying the tool tip
+        addClass(this.timeTip.el, 'jw-open');
+    }
+
+    disableTimeToolTip() {
+        // stop displaying the tool tip
         removeClass(this.timeTip.el, 'jw-open');
     }
 
