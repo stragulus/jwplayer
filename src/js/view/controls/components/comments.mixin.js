@@ -3,7 +3,8 @@ import { ajax } from 'utils/ajax';
 class CommentCue {
     constructor (time, message, author) {
         this.time = time;
-        this.text = author + ': ' + message;
+        this.author = author;
+        this.text = message;
         this.el = document.createElement('div');
         this.el.className = 'jw-comment jw-reset';
     }

@@ -13,6 +13,8 @@ import ThumbnailsMixin from 'view/controls/components/thumbnails.mixin';
 class TimeTip extends Tooltip {
 
     setup() {
+        this.author = document.createElement('span');
+        this.author.className = 'jw-text jw-comment-author jw-reset';
         this.text = document.createElement('span');
         this.text.className = 'jw-text jw-reset';
         this.img = document.createElement('div');
@@ -24,6 +26,7 @@ class TimeTip extends Tooltip {
         const wrapper = document.createElement('div');
         wrapper.className = 'jw-time-tip jw-reset';
         wrapper.appendChild(this.img);
+        wrapper.appendChild(this.author);
         wrapper.appendChild(this.text);
 
         this.addContent(wrapper);
@@ -33,7 +36,8 @@ class TimeTip extends Tooltip {
         style(this.img, styles);
     }
 
-    update(txt) {
+    update(txt, author) {
+        this.author.textContent = author || "";
         this.text.textContent = txt;
     }
 
@@ -240,6 +244,7 @@ class TimeSlider extends Slider {
         }
 
         let timetipText;
+        let author;
 
         // With touch events, we never will get the hover events on the cues that cause cues to be active.
         // Therefore use the info we about the scroll position to detect if there is a nearby cue to be active.
@@ -256,6 +261,7 @@ class TimeSlider extends Slider {
         if (this.activeCue) {
             timetipText = this.activeCue.text;
         } else if (this.activeComment) {
+            author = this.activeComment.author;
             timetipText = this.activeComment.text;
         } else {
             const allowNegativeTime = true;
@@ -268,7 +274,7 @@ class TimeSlider extends Slider {
         }
         const timeTip = this.timeTip;
 
-        timeTip.update(timetipText);
+        timeTip.update(timetipText, author);
         if (this.textLength !== timetipText.length) {
             // An activeCue or activeComment may cause the width of the timeTip container to change
             this.textLength = timetipText.length;
