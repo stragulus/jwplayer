@@ -213,7 +213,8 @@ const Model = function() {
         // add a comment to existing comments
         // TODO: not concurrency safe. Should it be?
         // TODO: validate comment
-        let comments = this.get('comments') || [];
+        // Make a copy, as modifying the original will not trigger the change: event
+        let comments = Object.assign([], this.get('comments') || []);
         comments.push(comment);
         this.set('comments', comments);
     };
