@@ -5,8 +5,7 @@ class CommentCue {
         this.time = time;
         this.text = author + ': ' + message;
         this.el = document.createElement('div');
-        // TODO: jw-cue -> jw-comment
-        this.el.className = 'jw-cue jw-reset';
+        this.el.className = 'jw-comment jw-reset';
     }
 
     align(duration) {

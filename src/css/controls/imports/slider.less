@@ -58,6 +58,7 @@
     .jw-buffer,
     .jw-progress,
     .jw-cue,
+    .jw-comment,
     .jw-knob {
         top: 50%;
     }
@@ -65,7 +66,8 @@
     .jw-rail,
     .jw-buffer,
     .jw-progress,
-    .jw-cue {
+    .jw-cue,
+    .jw-comment {
         transform: translate(0, -50%);
     }
 
@@ -121,18 +123,28 @@
     .jw-rail,
     .jw-buffer,
     .jw-progress,
-    .jw-cue {
+    .jw-cue,
+    .jw-comment {
         backface-visibility: hidden;
         height: 100%;
         transform: translate(0, -50%) scale(1, 0.6);
         transition: transform 150ms ease-in-out;
     }
 
-    .jw-cue {
+    .jw-cue,
+    .jw-comment {
         background-color: @background-color;
         cursor: pointer;
         position: absolute;
         width: 6px;
+    }
+
+    .jw-cue {
+        background-color: @background-color;
+    }
+
+    .jw-comment {
+        background-color: @comment-color;
     }
 
     &:hover,
@@ -142,7 +154,8 @@
         .jw-rail,
         .jw-buffer,
         .jw-progress,
-        .jw-cue {
+        .jw-cue,
+        .jw-comment {
             transform: translate(0, -50%) scale(1, 1);
         }
 
