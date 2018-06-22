@@ -218,7 +218,7 @@ const Model = function() {
         comments.push(comment);
         this.set('comments', comments);
         if (showUser) {
-            this.set('commentsShowUser', true);
+            this.set('commentsShowUser', comment);
         }
     };
 

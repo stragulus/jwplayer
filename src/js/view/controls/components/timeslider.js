@@ -379,25 +379,22 @@ class TimeSlider extends Slider {
         }
     }
 
-    showCommentNow(model, commentsShowUser) {
-        if (commentsShowUser) {
-            if (this.comments && this.comments.length) {
-                // disable manually selected tooltip
-                if (this.showSelectedToolTip) {
-                    this.showSelectedToolTip = false;
-                    this.hideTimeTooltip();
-                }
-
-                if (this.showPopupStartTime) {
-                    // TODO need to do anything?
-                }
-                this.showPopupStartTime = new Date().getTime() / 1000;
-
-                // assume we want to show the last added comment
-                const comment = this.comments[this.comments.length - 1];
-                const pct = this.calcPct(comment.time, model.get('duration'));
-                this.renderTimeToolTip(pct, comment.text, comment.author);
+    showCommentNow(model, commentToShow) {
+        if (commentToShow) {
+            // disable manually selected tooltip
+            if (this.showSelectedToolTip) {
+                this.showSelectedToolTip = false;
+                this.hideTimeTooltip();
             }
+
+            if (this.showPopupStartTime) {
+                // TODO need to do anything?
+            }
+            this.showPopupStartTime = new Date().getTime() / 1000;
+
+            // assume we want to show the last added comment
+            const pct = this.calcPct(commentToShow.video_position, model.get('duration'));
+            this.renderTimeToolTip(pct, commentToShow.message, commentToShow.author);
             this._model.set('commentsShowUser', false);
         }
     }
