@@ -83,11 +83,6 @@ const CommentsMixin = {
     },
 
     resetComments: function() {
-        // TODO: this logic needs to live in timeslider
-        if (this.activeNewCommentTimeout) {
-            clearTimeout(this.activeNewCommentTimeout);
-        }
-
         // this allows the player controls to fade out
         this._model.set('commentsAvailable', false);
 
@@ -97,6 +92,7 @@ const CommentsMixin = {
                 comment.el.parentNode.removeChild(comment.el);
             }
         });
+        this.comments = [];
     }
 };
 

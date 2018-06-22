@@ -164,7 +164,7 @@ class TimeSlider extends Slider {
             // comments to show as time progresses
             const comment = this.commentAtOffset(position);
             if (comment) {
-                const pct = this.calcPct(position, model.get('duration'));
+                const pct = this.calcPct(comment.time, model.get('duration'));
                 this.renderTimeToolTip(pct, comment.text, comment.author);
             } else {
                 this.disableTimeToolTip();
