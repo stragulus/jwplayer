@@ -45,6 +45,7 @@ const CommentsMixin = {
     addComment: function (obj) {
         // add new comment popup to existing list
         this.comments.push(new CommentCue(obj.video_position, obj.message, obj.author));
+        this.comments.sort(function(a, b) { return b.time - a.time });
         this._model.set('commentsAvailable', true);
     },
 
