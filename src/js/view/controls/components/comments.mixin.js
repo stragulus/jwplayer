@@ -83,7 +83,14 @@ const CommentsMixin = {
     },
 
     resetComments: function() {
+        // TODO: this logic needs to live in timeslider
+        if (this.activeNewCommentTimeout) {
+            clearTimeout(this.activeNewCommentTimeout);
+        }
+
+        // this allows the player controls to fade out
         this._model.set('commentsAvailable', false);
+
         // clears comment popups
         this.comments.forEach((comment) => {
             if (comment.el.parentNode) {

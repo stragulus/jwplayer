@@ -937,8 +937,8 @@ Object.assign(Controller.prototype, {
             _model.setComments(comments);
         };
 
-        this.addComment = function (comment) {
-            _model.addComment(comment);
+        this.addComment = function (comment, showUser) {
+            _model.addComment(comment, showUser);
         };
 
         this.updatePlaylist = function(playlist, feedData) {

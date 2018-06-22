@@ -209,7 +209,7 @@ const Model = function() {
         this.set('bandwidthEstimate', bwEstimate);
     };
 
-    this.addComment = function (comment) {
+    this.addComment = function (comment, showUser) {
         // add a comment to existing comments
         // TODO: not concurrency safe. Should it be?
         // TODO: validate comment
@@ -217,6 +217,9 @@ const Model = function() {
         let comments = Object.assign([], this.get('comments') || []);
         comments.push(comment);
         this.set('comments', comments);
+        if (showUser) {
+            this.set('commentsShowUser', true);
+        }
     };
 
     this.setComments = function(comments) {

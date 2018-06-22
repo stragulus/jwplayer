@@ -103,6 +103,7 @@ class TimeSlider extends Slider {
             .on('change:duration', this.onDuration, this)
             .on('change:cues', this.addCues, this)
             .on('change:comments', this.setComments, this)
+            .on('change:commentsShowUser', this.showCommentNow, this)
             .on('seeked', () => {
                 if (!this._model.get('scrubbing')) {
                     this.updateAriaText();
@@ -151,9 +152,16 @@ class TimeSlider extends Slider {
 
     onPosition(model, position) {
         this.updateTime(position, model.get('duration'));
-        // if user is not manually selecting a tool tip to show, try to auto-show comments 
-        // if available around the current duration
-        if (!this.showSelectedToolTip) {
+
+        if (this.showPopupStartTime) {
+            // showing recently added comment popup - overrides all else
+            const timeNow = new Date().getTime() / 1000;
+            if (timeNow - this.showPopupStartTime > 3) {
+                this.disableShowPopupComment();
+            }
+        } else if (!this.showSelectedToolTip) {
+            // no manually selected tool tip or popup comment. Check if there are
+            // comments to show as time progresses
             const comment = this.commentAtOffset(position);
             if (comment) {
                 const pct = this.calcPct(position, model.get('duration'));
@@ -256,6 +264,11 @@ class TimeSlider extends Slider {
     showTimeTooltip(evt) {
         let duration = this._model.get('duration');
         if (duration === 0) {
+            return;
+        }
+
+        // already displaying a comment
+        if (this.showPopupStartTime) {
             return;
         }
 
@@ -366,6 +379,34 @@ class TimeSlider extends Slider {
         }
     }
 
+    showCommentNow(model, commentsShowUser) {
+        if (commentsShowUser) {
+            if (this.comments && this.comments.length) {
+                // disable manually selected tooltip
+                if (this.showSelectedToolTip) {
+                    this.showSelectedToolTip = false;
+                    this.hideTimeTooltip();
+                }
+
+                if (this.showPopupStartTime) {
+                    // TODO need to do anything?
+                }
+                this.showPopupStartTime = new Date().getTime() / 1000;
+
+                // assume we want to show the last added comment
+                const comment = this.comments[this.comments.length - 1];
+                const pct = this.calcPct(comment.time, model.get('duration'));
+                this.renderTimeToolTip(pct, comment.text, comment.author);
+            }
+            this._model.set('commentsShowUser', false);
+        }
+    }
+
+    disableShowPopupComment() {
+        this.disableTimeToolTip(); 
+        this.showPopupStartTime = undefined;
+    }
+
     updateAriaText() {
         const position = this._model.get('position');
         const duration = this._model.get('duration');
@@ -384,6 +425,7 @@ class TimeSlider extends Slider {
         this.resetComments();
         this.timeTip.resetWidth();
         this.textLength = 0;
+        this.showPopupStartTime = undefined;
     }
 }
 

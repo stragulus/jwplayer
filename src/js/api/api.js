@@ -689,10 +689,11 @@ export default function Api(element) {
         /**
          * Adds a comment to be displayed on the time slider.
          * @param {object} comment - The comment to add.
+         * @param {boolean} showUser - If true, show this comment to the user immediately
          * @returns {Api} The Player API instance.
          */
-        addComment(comment) {
-            core.addComment(comment);
+        addComment(comment, showUser) {
+            core.addComment(comment, showUser);
             return this;
         },
 
